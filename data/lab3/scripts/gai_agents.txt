@@ -1,0 +1,50 @@
+@startuml
+title GAI Agents Overview for Event Log Mining
+
+skinparam note {
+  BackgroundColor #FFF8E6
+  BorderColor #D6D6D6
+}
+
+start
+
+:Log Data Curator <<GAI>>;
+note right
+- Deduplicates & normalizes messages
+- Infers missing attrs (service/resource)
+- Maps to templates & candidate case notions
+- Prepares event-log schema (XES/CSV)
+end note
+
+:Insight Summarizer <<GAI>>;
+note right
+- Converts metrics (fitness, precision, generalization)
+  to clear narratives
+- Highlights business impact and risk
+- Creates variant summaries
+end note
+
+:Pattern Interpreter <<GAI>>;
+note right
+- Detects motifs & anomaly clusters across traces
+- Correlates failures with components/releases
+- Flags drift and rare variants
+- Suggests root-cause hypotheses
+end note
+
+:Mining Orchestrator <<GAI>>;
+note right
+- Chooses/weights Inductive vs Heuristic
+- Tunes parameters by feedback (noise/dep thresholds)
+- Sets quality gates & acceptance thresholds
+- Produces ranked fix list & re-run plan
+end note
+
+if (Gates satisfied?) then (Yes)
+  :Generate Final Model & Report;
+  stop
+else (No)
+  :Send targeted fixes & re-mining tasks;
+  --> :Log Data Curator <<GAI>>;
+endif
+@enduml

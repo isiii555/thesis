@@ -1,0 +1,41 @@
+@startuml
+title Base Workflow: From Raw Logs to Insights (No-LLM Baseline)
+
+start
+:Collect raw system/app/infra logs;
+:Preprocess & Normalize
+- parse timestamps
+- unify schema
+- remove noise;
+
+if (Correlation keys present?\n(e.g., requestId, sessionId)) then (Yes)
+  :Group by correlation keys;
+else (No)
+  :Mine message templates;
+  :Cluster similar events;
+  :Apply temporal windowing;
+endif
+
+:Build traces (caseId, activity, timestamp, resource,...);
+:Export event log (XES/CSV);
+
+:Run process discovery
+- Inductive Miner
+- Heuristic Miner;
+
+:Evaluate model
+- fitness
+- precision
+- generalization;
+
+:Compute performance KPIs
+- throughput
+- waiting times
+- bottlenecks;
+
+:Generate dashboards & report;
+:Create improvement actions & backlog;
+
+:Feedback: re-collect logs for next cycle;
+stop
+@enduml

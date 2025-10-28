@@ -1,0 +1,40 @@
+@startuml
+title Sequence: One Analysis Run (Logs → Traces → Model → KPIs)
+
+actor Analyst
+participant "LogCollector" as LC
+participant "Preprocessor" as PP
+participant "TraceBuilder" as TB
+participant "EmbeddingService" as EMB <<GAI>>
+participant "LLMLabeler" as LLM <<GAI>>
+participant "DiscoveryEngine" as DE
+participant "ConformanceEval" as CE
+participant "MetricsService" as MS
+participant "Dashboard" as UI
+
+Analyst -> LC : triggerCollect()
+LC --> PP : rawLogs
+
+PP -> PP : normalize() / filterNoise() / templateMining()
+PP -> TB : normalizedEvents
+
+TB -> EMB : embed(messages)
+EMB --> TB : vectors
+
+TB -> LLM : suggestActivityLabels(templates)
+LLM --> TB : activityLabels
+
+TB -> TB : correlate()\n(hybrid: keys + similarity)
+TB --> Analyst : eventLog(XES/CSV)
+
+Analyst -> DE : discoverModel(eventLog)
+DE --> Analyst : processModel
+
+Analyst -> CE : evaluate(processModel, eventLog)
+CE --> Analyst : fitness, precision, generalization
+
+Analyst -> MS : computeKPIs(eventLog, processModel)
+MS --> UI : KPIs, bottlenecks
+
+UI --> Analyst : interactive dashboards
+@enduml

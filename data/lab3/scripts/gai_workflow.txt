@@ -1,0 +1,101 @@
+@startuml
+title Event Log Mining Workflow (with GAI Agents)
+
+/' -------- Optional styling -------- '/
+skinparam backgroundColor #FFFFFF
+skinparam activity {
+  StartColor #000000
+  EndColor #000000
+  BarColor #444444
+  BorderColor #222222
+  FontName Arial
+  FontSize 13
+  FontColor #111111
+}
+skinparam partition {
+  BorderColor #999999
+  FontColor #222222
+}
+skinparam note {
+  BackgroundColor #FFF8E6
+  BorderColor #D6D6D6
+  FontColor #333333
+}
+
+/' -------- Workflow -------- '/
+start
+repeat
+
+partition "System / Input" {
+  :Mining run started;
+  :Load system logs (app / OS / K8s / services);
+  :Extract raw records (JSON/CSV);
+}
+
+partition "Data Processing" {
+  :Preprocess & clean\n- parse timestamps\n- normalize fields\n- remove noise;
+  :Template mining (log message patterns);
+  :Prepare event dataset\n(time, component, templateId, attrs);
+}
+
+partition "Analysis (parallel)" {
+  fork
+    :Detect correlation keys\n(reqId/traceId);\nelse fallback rules;
+    :Build traces\n(caseId, activity, ts, resource);
+    :Export event log (XES/CSV);
+    :Run Inductive Miner;
+    :Run Heuristic Miner;
+    :Merge/Select model\n(accuracy vs simplicity);
+    :Compute conformance KPIs\nfitness, precision, generalization;
+  fork again
+    :Analyst review\n- case notion\n- activity semantics\n- domain constraints;
+  end fork
+}
+
+partition "GAI Support" {
+  :GAI Data Curator <<GAI>>;
+  note right
+    Deduplicates & enriches logs,
+    infers missing attrs,
+    aligns to candidate XES schema
+  end note
+
+  :Embedding Service <<GAI>>;
+  note right
+    Vectorizes messages/templates
+    and yields similarity scores
+  end note
+
+  :LLM Labeler <<GAI>>;
+  note right
+    Suggests activity names and
+    case-notion hints
+  end note
+
+  :LLM Explainer <<GAI>>;
+  note right
+    Explains deviations, drift and
+    bottlenecks in natural language
+  end note
+
+  :LLM Prioritizer / Orchestrator <<GAI>>;
+  note right
+    Ranks fixes by impact,
+    tunes miner parameters,
+    balances Inductive vs Heuristic
+  end note
+}
+
+partition "Decision & Output" {
+  if (Results satisfactory?) then (Yes)
+    break
+  else (No)
+    :Refine parameters /\nrequest reprocessing;
+  endif
+}
+
+repeat while (Re-run needed?) is (Yes)
+
+:Finalize model & report\n(model, KPIs, NL insights);
+stop
+@enduml

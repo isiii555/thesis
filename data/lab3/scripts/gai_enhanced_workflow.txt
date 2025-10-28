@@ -1,0 +1,43 @@
+@startuml
+title AI-Enhanced Event Log Mining Workflow (with GAI/LLM)
+
+partition "Data Sources" {
+  start
+  :Raw logs (web/app/OS/K8s);
+}
+
+partition "Preprocessing" {
+  :Normalize timestamps & fields;
+  :Template mining & clustering;
+}
+
+partition "GAI Services" {
+  :Compute embeddings for messages <<GAI>>;
+  :LLM suggests activity labels <<GAI>>;
+  :LLM proposes case notion hints <<GAI>>;
+}
+
+partition "Trace Building" {
+  :Hybrid correlation (keys + similarity);
+  :Build ordered traces per case;
+  :Validate trace coherence;
+  :Export XES/CSV;
+}
+
+partition "Mining & Evaluation" {
+  :Hybrid discovery (Inductive + Heuristic);
+  :Conformance (fitness/precision);
+  :Performance analysis (SLA, latency);
+}
+
+partition "Explainability (GAI)" {
+  :LLM explains anomalies & deviations <<GAI>>;
+  :Prioritize issues by impact <<GAI>>;
+}
+
+partition "Ops & Governance" {
+  :Dashboards & action items;
+  :Feedback loop for re-logging & re-mining;
+  stop
+}
+@enduml
